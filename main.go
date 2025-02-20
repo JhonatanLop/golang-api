@@ -8,6 +8,7 @@ import (
 )
 
 type Person struct {
+	ID     int
 	Name   string
 	Age    int
 	Salary float64
@@ -60,22 +61,23 @@ func postPeople(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
+	person.ID = len(people) + 1
 	people = append(people, person)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(person)
 }
 
 func deletePeople(w http.ResponseWriter, r *http.Request) {
-	var name struct {
-		Name string `json:"name"`
+	var id struct {
+		ID int `json:"id"`
 	}
-	err := json.NewDecoder(r.Body).Decode(&name)
+	err := json.NewDecoder(r.Body).Decode(&id)
 	if err != nil {
 		http.Error(w, "Bad Request: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 	for i := 0; i < len(people); i++ {
-		if people[i].Name == name.Name {
+		if people[i].ID == id.ID {
 			people = append(people[:i], people[i+1:]...)
 			w.WriteHeader(http.StatusNoContent)
 			return
@@ -92,7 +94,7 @@ func putPeople(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for i := 0; i < len(people); i++ {
-		if people[i].Name == person.Name {
+		if people[i].ID == person.ID {
 			people[i] = person
 			w.WriteHeader(http.StatusNoContent)
 			return
