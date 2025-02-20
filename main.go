@@ -14,13 +14,6 @@ type Person struct {
 	Salary float64
 }
 
-// example post json
-// {
-// 	"name": "John",
-// 	"age": 30,
-// 	"salary": 1000.0
-// }
-
 var people []Person
 
 func main() {
