@@ -62,22 +62,26 @@ func postPeople(w http.ResponseWriter, r *http.Request) {
 	}
 	people = append(people, person)
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(person)
 }
 
 func deletePeople(w http.ResponseWriter, r *http.Request) {
-	var name string
+	var name struct {
+		Name string `json:"name"`
+	}
 	err := json.NewDecoder(r.Body).Decode(&name)
 	if err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		http.Error(w, "Bad Request: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 	for i := 0; i < len(people); i++ {
-		if people[i].Name == name {
-			people = append(people, people[:i]...)
+		if people[i].Name == name.Name {
+			people = append(people[:i], people[i+1:]...)
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 	}
+	http.Error(w, "Person not found", http.StatusNotFound)
 }
 
 func putPeople(w http.ResponseWriter, r *http.Request) {
@@ -94,4 +98,5 @@ func putPeople(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	http.Error(w, "Person not found", http.StatusNotFound)
 }
